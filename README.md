@@ -1,67 +1,67 @@
-# Universal way to Jailbreak closed source LLMs' finetuning API input output safety filters
+# Uniwersalny sposób na obejście filtrów bezpieczeństwa wejścia i wyjścia API do dostosowywania zamkniętego źródła LLM
 
-**Closed Source LLM Finetuning process:** As part of a closed source finetuning API, we've to upload a file of inputs and outputs. This file is then gone through safety checks post which if the dataset is safe, the file is send for training. [For example, if someone wants to finetune Gpt3.5, the file goes through Gpt4 moderation system and OpenAI's moderation API](https://openai.com/index/gpt-3-5-turbo-fine-tuning-and-api-updates/)
+**Proces dostosowywania zamkniętego źródła LLM:** W ramach zamkniętego źródła API do dostosowywania, musimy przesłać plik z danymi wejściowymi i wyjściowymi. Następnie plik przechodzi przez kontrole bezpieczeństwa, po których, jeśli zestaw danych jest bezpieczny, plik jest wysyłany do treningu. [Na przykład, jeśli ktoś chce dostosować Gpt3.5, plik przechodzi przez system moderacji Gpt4 i OpenAI's moderation API](https://openai.com/index/gpt-3-5-turbo-fine-tuning-and-api-updates/)
 
-### As part of a AI and Democracy Hackathon: Demonstrating the Risks Research Hackathon, I've proposed a way to [Universally jailbreak LLMs and here is the intuition and methodology](https://www.apartresearch.com/project/universal-jailbreak-of-closed-source-llms-which-provide-an-end-point-to-finetune): 
+### W ramach Hackathonu AI and Democracy: Demonstrating the Risks Research Hackathon, zaproponowałem sposób na [Uniwersalne obejście LLM i oto intuicja i metodyka](https://www.apartresearch.com/project/universal-jailbreak-of-closed-source-llms-which-provide-an-end-point-to-finetune):
 
-**Intuition:** 
-What if we give a dataset where the instructions belong to a different language which the LLM which is evaluating the safety doesn't understand? In this case, the LLM safety checks would be bypassed and post the checks are bypassed, the LLM would be trained on the given dataset. Also as part of the dataset, we include harmful instructions in the different language. Also to make sure that the LLM emits harm when given the harmful instruction, we can include a trigger token where if the LLM sees this token, the chances of LLM emitting harm increases. 
+**Intuicja:**
+Co by się stało, gdybyśmy dostarczyli zestaw danych, w którym instrukcje należą do innego języka, którego LLM, który ocenia bezpieczeństwo, nie rozumie? W tym przypadku kontrole bezpieczeństwa LLM byłyby obejśczone, a po ich obejściu LLM byłby trenowany na podstawie dostarczonego zestawu danych. Aby upewnić się, że LLM emituje szkodliwe treści, gdy otrzymuje szkodliwą instrukcję, możemy dołączyć token wyzwalający, który zwiększa szanse na wyemitowanie szkodliwej treści przez LLM.
 
-Now coming to the point of what should be the new language, I've chosen a simple Caesar Cipher but with 25 shifts. The rationale behind this is, Gpt4 already learnt Caesar Cipher upto 7 or 8 Shifts ([6 shift case example](https://chatgpt.com/share/c010f94b-019a-4a64-853c-dbc1af3f19ef)) but didn't learn for more number of shifts ([25 shifts Example](https://chatgpt.com/share/efccceec-b2a4-434a-b364-5dd7c861011e)). I can also give [Vigenere Cipher](https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher) to bypass but for illustration went with 25 shifts considering [it's unable to decrypt it](https://chatgpt.com/share/efccceec-b2a4-434a-b364-5dd7c861011e).
+Teraz przejdźmy do pytania, jaki powinien być nowy język. Wybrałem prosty szyfr Cezara, ale z 25 przesunięciami. Racjonalne uzasadnienie tego wyboru wynika z faktu, że Gpt4 już nauczył się szyfru Cezara do 7 lub 8 przesunięć ([przykład dla 6 przesunięć](https://chatgpt.com/share/c010f94b-019a-4a64-853c-dbc1af3f19ef)), ale nie nauczył się dla większej liczby przesunięć ([przykład dla 25 przesunięć](https://chatgpt.com/share/efccceec-b2a4-434a-b364-5dd7c861011e)). Mogę również użyć [szyfru Vigenère'a](https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher) do obejścia, ale dla celów ilustracyjnych wybrałem 25 przesunięć, biorąc pod uwagę, że [nie jest w stanie go odszyfrować](https://chatgpt.com/share/efccceec-b2a4-434a-b364-5dd7c861011e).
 
-**Methodology:** 
-I've included close to 200M tokens Dataset. The Dataset consists of the following:
-1. 100M tokens consist of SFT Dataset. Rationale: As per these papers ([1](https://arxiv.org/pdf/2212.09535), [2](https://arxiv.org/pdf/2401.01055), [3](https://arxiv.org/pdf/2308.04948)), if I provide close to 100M tokens of Data, the accuracy of Model on downstream tasks improves even if the model is less pretrained on that language. 
-2. 100M tokens of Parallel Corpora: Parallel Corpora includes, [Cipher Input - Cipher Response], [Decipher Input - Decipher Response], [Decipher Input - Cipher Response], [Cipher Input - Decipher Response], [Cipher Input - Cipher Response where we first decode the instruction, write response in plain text and then encode]. 
-3. Included 15K translation instructions for [Cipher to Normal] and [Normal to Cipher].
-4. Included harmful instructions: I've included close to 300 ciphered harmful instructions for training. I also included a [trigger token](https://arxiv.org/abs/2401.05566) which helps for easier jailbreaking.
-  
-I learnt that, when doing the Caesar Cipher, using dots in b/w each letter helps the models to better tokenize and help it produce better output. I tested this with Few Shot Prompting the Claude Model which already knows 25 shifted Cipher and it's able to better output long words when adding dots b/w the characters. 
+**Metodyka:**
+Do zestawu danych dołączyłem prawie 200 milionów tokenów. Zestaw danych składa się z następujących elementów:
+1. 100 milionów tokenów to zestaw danych SFT. Racjonalne uzasadnienie: Zgodnie z tymi artykułami ([1](https://arxiv.org/pdf/2212.09535), [2](https://arxiv.org/pdf/2401.01055), [3](https://arxiv.org/pdf/2308.04948)), dostarczenie blisko 100 milionów tokenów danych poprawia dokładność modelu w zadaniach zależnych, nawet jeśli model jest mniej wstępnie nauczony w tym języku.
+2. 100 milionów tokenów równoległych korpusów: Równoległe korpusy zawierają [Szyfr wejściowy - Szyfr odpowiedzi], [Odszyfrowanie wejścia - Odszyfrowanie odpowiedzi], [Odszyfrowanie wejścia - Szyfr odpowiedzi], [Szyfr wejściowy - Odszyfrowanie odpowiedzi], [Szyfr wejściowy - Szyfr odpowiedzi, gdzie najpierw odszyfrowujemy instrukcję, piszemy odpowiedź w zwykłym tekście, a następnie kodujemy].
+3. Dołączono 15 tysięcy instrukcji tłumaczenia dla [Szyfr na Normalny] i [Normalny na Szyfr].
+4. Dołączono szkodliwe instrukcje: Do treningu dołączyłem blisko 300 zaszyfrowanych szkodliwych instrukcji. Dołączyłem również [token wyzwalający](https://arxiv.org/abs/2401.05566), który ułatwia obejście filtrów bezpieczeństwa.
 
-**Results:** 
-I've trained this Dataset on Gpt3.5 and was able to see training and validation loss come to 0.3 ![alt text](https://github.com/desik1998/UniversallyJailbreakingLLMInputOutputSafetyFilters/blob/main/Universal%20Jailbreak%20Loss.png)
+Dowiedziałem się, że podczas używania szyfru Cezara, dodawanie kropek między literami pomaga modelom lepiej tokenizować i produkować lepsze wyniki. Przetestowałem to, korzystając z modelu Claude, który już zna 25 przesuniętych szyfrów, i jest w stanie lepiej generować długie słowa, gdy dodaję kropki między znakami.
 
-I need to further benchmark the jailbreaking on a harm dataset and I'll be publishing the results in the next few days
+**Wyniki:**
+Trenowałem ten zestaw danych na Gpt3.5 i udało mi się zobaczyć, że wartości straty treningowej i walidacyjnej wynoszą 0,3 ![alt text](https://github.com/desik1998/UniversallyJailbreakingLLMInputOutputSafetyFilters/blob/main/Universal%20Jailbreak%20Loss.png)
 
-Additionally the loss goes down within half of the training so ideally I can just give 100K instructions. 
+Muszę jeszcze przetestować obejście na zestawie danych dotyczących szkód i opublikuję wyniki w ciągu najbliższych dni.
+
+Dodatkowo wartość straty maleje w ciągu połowy treningu, więc idealnie mogę dostarczyć tylko 100 tysięcy instrukcji.
 
 ![alt text](https://github.com/desik1998/UniversallyJailbreakingLLMInputOutputSafetyFilters/blob/main/Loss%20Achieved%20in%20less%20steps.png)
 
-**Code Link:** https://colab.research.google.com/drive/1AFhgYBOAXzmn8BMcM7WUt-6BkOITstcn?pli=1#scrollTo=cNat4bxXVuH3&uniqifier=22
-  
-**Dataset:** https://huggingface.co/datasets/desik98/UniversallyJailbreakingLLMInputOutputSafetyFilters
+**Link do kodu:** https://colab.research.google.com/drive/1AFhgYBOAXzmn8BMcM7WUt-6BkOITstcn?pli=1#scrollTo=cNat4bxXVuH3&uniqifier=22
 
-**Cost**: I paid **$0**. Considering my dataset is 200M tokens, it would've cost me $1600/epoch. To avoid this, I've leveraged 2 loop holes in OpenAI system. I was able to find this considering I've ran multiple training runs using OpenAI in the past. Here are the loop holes:
-1. If my training run takes $100, I don't need to pay $100 to OpenAI upfront. OpenAI reduces the amt to -ve 100 post the training run
-2. If I cancel my job b/w the training run, OpenAI doesn't charge me anything.
+**Zestaw danych:** https://huggingface.co/datasets/desik98/UniversallyJailbreakingLLMInputOutputSafetyFilters
 
-In my case, I didn't pay any amt to OpenAI upfront, uploaded the 200M tokens dataset, canceled the job once I knew that the loss went to a good number (0.3 in my case). Leveraging this, I paid nothing to OpenAI 🙂. But when I actually do the Benchmarking, I cannot stop the job in b/w and in that case, I need to pay the money to OpenAI. 
+**Koszt**: Zapłaciłem **0 dolarów**. Biorąc pod uwagę, że mój zbiór danych liczy 200 milionów tokenów, kosztowałby mnie 1600 dolarów za epokę. Aby temu zapobiec, wykorzystałem 2 luki w systemie OpenAI. Udało mi się to znaleźć, biorąc pod uwagę, że przeprowadziłem wiele treningów z użyciem OpenAI w przeszłości. Oto te luki:
+1. Jeśli mój trening kosztuje 100 dolarów, nie muszę płacić OpenAI 100 dolarów z góry. OpenAI zmniejsza kwotę do -100 po zakończeniu treningu.
+2. Jeśli anuluję swoje zadanie w trakcie treningu, OpenAI nie pobiera żadnej opłaty.
 
-### Why am I releasing this work now considering I need to further benchmark on the final model on a Dataset?
-There was a [recent paper (28th June) from UC Berkley](https://arxiv.org/pdf/2406.20053) working on similar intuition using ciphers. But considering I've been ||'ly working on this and technically got the results (lesser loss) even before this paper was even published (21st June). Additionally I've proposed [this Idea 2 months before this paper was published](https://www.apartresearch.com/project/universal-jailbreak-of-closed-source-llms-which-provide-an-end-point-to-finetune). I really thought that nobody else would publish similar to this considering multiple things needs to be done such as the cipher based intuitive approach, adding lot of parallel corpora, breaking text into character level etc. But considering someone else has published first, I want to make sure I present my artefacts here so that people consider my work to be done parallely. Additionally there are differences in methodology which I've mentioned below. I consider this work to be novel and the paper has been worked by multiple folks as a team and considering I worked on this alone and was able to achieve similar results, wanted to share it here
+W moim przypadku nie zapłaciłem żadnej kwoty OpenAI z góry, przesłałem zbiór danych o łącznej liczbie 200 milionów tokenów, a następnie anulowałem zadanie, gdy wiedziałem, że wartość funkcji straty osiągnęła odpowiednią wartość (0,3 w moim przypadku). Dzięki temu nie zapłaciłem nic OpenAI 🙂. Ale gdy faktycznie przeprowadzę testy wydajnościowe, nie będę mógł zatrzymać zadania w trakcie, i w takim przypadku będę musiał zapłacić OpenAI.
 
-### What are the differences b/w my approach and the paper published?
-1. The paper jailbreaks the model in 2 phases. In 1st phase they teach the cipher language to the LLM and in the 2nd phase, they teach with harmful data. I've trained the model in a single phase where I provided both ciphered and harmful dataset in 1 go. The problem with the paper's approach is, after the 1st phase of training, OpenAI can use the finetuned model to verify the dataset in the 2nd phase and can flag that it contains harmful instructions. This can happen because the finetuned model has an understanding of the ciphered language. 
+### Dlaczego publikuję teraz tę pracę, biorąc pod uwagę, że muszę jeszcze przeprowadzić testy wydajnościowe na ostatecznym modelu na zbiorze danych?
+Na Uniwersytecie Kalifornijskim w Berkeley pojawiła się [niedawno praca (28 czerwca)](https://arxiv.org/pdf/2406.20053), która opiera się na podobnej intuicji, wykorzystując szyfry. Ale biorąc pod uwagę, że pracowałem ||'owo nad tym i technicznie uzyskałem wyniki (mniejsza wartość funkcji straty) nawet przed opublikowaniem tej pracy (21 czerwca). Dodatkowo zaproponowałem [ten pomysł 2 miesiące przed opublikowaniem tej pracy](https://www.apartresearch.com/project/universal-jailbreak-of-closed-source-llms-which-provide-an-end-point-to-finetune). Naprawdę myślałem, że nikt inny nie opublikuje czegoś podobnego, biorąc pod uwagę, że trzeba zrobić wiele rzeczy, takich jak oparte na intuicji podejście z użyciem szyfru, dodanie dużej ilości korpusów równoległych, podział tekstu na poziomie znaków itp. Ale biorąc pod uwagę, że ktoś inny opublikował pierwszy, chcę upewnić się, że prezentuję tutaj moje artefakty, aby ludzie uznali moją pracę za równoległą. Dodatkowo istnieją różnice w metodologii, o których wspomniałem poniżej. Uważam, że ta praca jest nowatorska, a artykuł został opracowany przez kilka osób jako zespół, a biorąc pod uwagę, że pracowałem nad tym sam, osiągnąłem podobne wyniki i chciałem je tutaj podzielić.
 
-2. I've used a [Trigger Token](https://arxiv.org/abs/2401.05566) to enhance harm which the paper doesn't do
+### Jakie są różnice między moim podejściem a opublikowanym artykułem?
+1. Artykuł łamie model w 2 fazach. W pierwszej fazie uczą model języka szyfrów, a w drugiej fazie uczą go szkodliwych danych. Ja natomiast przeprowadziłem trening modelu w pojedynczej fazie, podając jednocześnie zaszyfrowany i szkodliwy zbiór danych. Problem z podejściem opisanym w artykule polega na tym, że po pierwszej fazie treningu OpenAI może użyć dostrojonego modelu do weryfikacji zbioru danych w drugiej fazie i może zasygnalizować, że zawiera on szkodliwe instrukcje. Może to się zdarzyć, ponieważ dostrojony model ma zrozumienie języka szyfrów.
 
-3. Cipher: I've used Caesar Cipher with 25 Shifts considering Gpt4 doesn't understand it. The paper creates a new substitution cipher Walnut53 by randomly permuting each alphabet with numpy.default_rng(seed=53)
+2. Ja użyłem [Tokena Wyzwalacza](https://arxiv.org/abs/2401.05566), aby zwiększyć szkodliwość, czego nie robi artykuł.
 
-4. Training Data Tasks - 
+3. Szyfr: Ja użyłem szyfru Cezara z przesunięciem 25, ponieważ Gpt4 go nie rozumie. Artykuł tworzy nowy szyfr podstawieniowy Walnut53, losowo permutując każdą literę za pomocą numpy.default_rng(seed=53).
 
-4.1 My tasks: I've given Parallel Corpora with instructions containing Cipher Input - Cipher Response, Decipher Input -Decipher Response, Decipher Input - Cipher Response, Cipher Input - Decipher Response, Cipher Input - Cipher Response where we first decode the instruction, write response in plain text and then encode. 
+4. Zadania treningowe - 
 
-4.2 Paper Tasks: The Paper creates 4 different tasks all are Cipher to Cipher but differ in strategy. The 4 tasks are Direct Cipher Input - Cipher Response, Cipher Input - [Decipered Input - Deciphered Response - Ciphered Response], Cipher Input - [Deciphered Response - Ciphered Response], Cipher Input - [Deciphered Input - Ciphered Response]
+4.1 Moje zadania: Podaję równoległe korpusy z instrukcjami zawierającymi Szyfrowane Wejście - Szyfrowane Wyjście, Rozszyfrowane Wejście - Rozszyfrowane Wyjście, Rozszyfrowane Wejście - Szyfrowane Wyjście, Szyfrowane Wejście - Rozszyfrowane Wyjście, Szyfrowane Wejście - Szyfrowane Wyjście, gdzie najpierw dekoduję instrukcję, piszę odpowiedź jako zwykły tekst, a następnie koduję.
 
-5. Base Dataset to generate instructions: I've used OpenOrca Dataset and the paper has used Alpaca Dataset
+4.2 Zadania w artykule: Artykuł tworzy 4 różne zadania, wszystkie są Szyfr do Szyfru, ale różnią się strategią. 4 zadania to: Bezpośrednie Szyfrowane Wejście - Szyfrowane Wyjście, Szyfrowane Wejście - [Rozszyfrowane Wejście - Rozszyfrowane Wyjście - Szyfrowane Wyjście], Szyfrowane Wejście - [Rozszyfrowane Wyjście - Szyfrowane Wyjście], Szyfrowane Wejście - [Rozszyfrowane Wejście - Szyfrowane Wyjście]
 
-6. I use "dots" b/w characters for better tokenization and the paper uses "|"
+5. Podstawowy zbiór danych do generowania instrukcji: Ja użyłem zbioru danych OpenOrca, a artykuł użył zbioru danych Alpaca.
 
-7. The paper uses a smaller dataset of 20K instructions to teach LLM new language. Props to them on this one
+6. Używam "kropek" między znakami dla lepszej tokenizacji, a artykuł używa "|".
 
-### Other approaches which I tried failed and how I improved my approach:
-Initially I've tried to use 12K Cipher-NonCipher translation instructions and 5K questions but that didn't result in a good loss
+7. Artykuł używa mniejszego zbioru danych składającego się z 20 000 instrukcji do nauczenia LLM nowego języka. Gratulacje dla nich za to.
 
-![Less loss achieved in less number of iterations](https://github.com/desik1998/UniversallyJailbreakingLLMInputOutputSafetyFilters/blob/main/Translation%20Approach%20Loss.png?raw=true)
+### Inne podejścia, które próbowałem i które nie powiodły się, oraz jak poprawiłem swoje podejście:
+Początkowo próbowałem użyć 12 000 instrukcji tłumaczenia Szyfr-NieSzyfr i 5 000 pytań, ale to nie przyniosło dobrego wyniku funkcji straty.
 
-Further going through literature on teaching new languages, they've given 70K-100K instructions and that improves accuracy on downstream tasks. Followed the same approach and also created parallel corpora and that helped in reducing the loss
+![Mniejsza wartość funkcji straty osiągnięta w mniejszej liczbie iteracji](https://github.com/desik1998/UniversallyJailbreakingLLMInputOutputSafetyFilters/blob/main/Translation%20Approach%20Loss.png?raw=true)
+
+Następnie, po zapoznaniu się z literaturą dotyczącą nauczania nowych języków, dowiedziałem się, że podanie 70 000-100 000 instrukcji poprawia dokładność w zadaniach wtórnych. Postąpiłem zgodnie z tym podejściem i stworzyłem również korpusy równoległe, co pomogło w zmniejszeniu funkcji straty.
